@@ -20,8 +20,8 @@
                         <td>{{ $territory->territory_code ?? '-' }}</td>
                         <td>{{ $territory->territory_name ?? '-' }}</td>
                         <td>{{ $territory->region->region_name ?? '-' }}</td>
-                        {{-- <td>{{ $territory->zone[0]? $territory->longdescription : '-' }}</td> --}}
-                        <td>{{ $user->territory[0]->region[0]->zone[0]->longdescription ?? '-' }}</td>
+                        <td>{{ $territory->zone? $territory->zone->longdescription : '-' }}</td>
+                        {{-- <td>{{ $user->territory[0]->region[0]->zone[0]->longdescription ?? '-' }}</td> --}}
                     </tr>
                     @endforeach
                 </tbody>

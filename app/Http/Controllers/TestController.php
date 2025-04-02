@@ -12,7 +12,7 @@ Use App\Models\tterritory;
 
 class TestController extends Controller
 {
-        public function zone_index(){
+    public function zone_index(){
         $zones = Zone::all();
         return view('admin.zone_view', compact('zones'));
     }
@@ -25,8 +25,14 @@ class TestController extends Controller
 
     public function territory_index() {
         $territories = tterritory::with(['zone', 'region'])->get();
+        //dd($territories);
         return view('admin.terrirtory_view', compact('territories'));
     }
+    // public function territory_index() {
+    //     $territories = Tterritory::with(['zone', 'region'])->get();
+    //     dd($territories);
+    //     return view('admin.terrirtory_view', compact('territories'));
+    // }
     public function add_zone(){
 
         return view('admin.add_zone');

@@ -9,7 +9,7 @@ class SkuController extends Controller
 {
     public function index() {
         $skus = Sku::all();
-        return view('product.view_sku', compact('Skus'));
+        return view('product.view_sku', compact('skus'));
     }
 
     public function product_create()

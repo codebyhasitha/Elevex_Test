@@ -14,7 +14,6 @@
                         <th scope="col" style="width: 10%;">MRP</th>
                         <th scope="col" style="width: 15%;">Distributor Price</th>
                         <th scope="col" style="width: 15%;">Weight/Volume</th>
-                        <th scope="col" style="width: 15%;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
