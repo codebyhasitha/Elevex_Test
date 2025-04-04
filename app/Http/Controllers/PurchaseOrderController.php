@@ -12,10 +12,80 @@ use App\Models\user;
 use App\Models\purchaseOrder;
 use App\Models\PurchaseOrderItem;
 use App\Models\territory;
+use App\Models\freeIssue;
+use App\Models\Discount;
+
+
 use Illuminate\Support\Facades\DB;
 
 class PurchaseOrderController extends Controller
 {
+
+    public function units_cal(Request $request){
+    
+        $sku=Sku::where('id',$request->pro_id)->select('units','mrp','sku_id')->first();
+        $freeissue=freeIssue::where('purchse_product', $sku->sku_id)->select('purchse_product','purchase_Quantity','Free_Quantity','freeissue_type')->first();
+        
+        $freeQty = 0;
+        $units=$sku->units*$request->cases;
+        $price=$sku->mrp*$units;
+
+        if($sku->sku_id == $freeissue->purchse_product){
+            if($freeissue->freeissue_type === 'multiple'){
+                if( $request->cases >= $freeissue->purchase_Quantity){
+                    $freeQty=floor($request->cases / $freeissue->purchase_Quantity * $freeissue->Free_Quantity) ;
+                }
+                else if($request->cases <= $freeissue->purchase_Quantity){
+                    $freeQty =0;
+                }
+                else{
+                    $freeQty =0;
+                }
+                
+            }
+            else if($freeissue->freeissue_type === 'flat') {
+                if( $request->cases >= $freeissue->purchase_Quantity){
+                    $freeQty = $freeissue->Free_Quantity;
+                }
+                else if($request->cases <= $freeissue->purchase_Quantity){
+                    $freeQty =0;
+                }
+                else{
+                    $freeQty =0;
+                }          
+            }
+            else{
+                $freeQty =0;
+            }
+
+        }
+        return [
+            "freeQty"=>$freeQty,
+            "units"=>$units,
+            "price"=>$price];
+    }
+
+    public function product_discount(Request $request)
+    {
+        dd($request->all());
+            $sku = Sku::where('id', $request->pro_id)->select('sku_id')->first();
+            $discount = Discount::where('purchase_product', $sku->sku_id)->select('purchase_product', 'discount_percent')->first();
+            
+            $disAmnt = 0;
+            
+            if ($sku->sku_id == $discount->purchase_product)
+            {
+                $disAmnt = ($request->price * $discount->discount_percent) / 100;
+            } 
+            else {
+                $disAmnt = $request->price;
+            }
+            
+            return response()->json([
+                "disAmnt" => $disAmnt
+            ]);
+    }
+        
     public function po_create(){
         $zones = Zone::all();
         $regions = Rregion::all();
@@ -95,19 +165,7 @@ class PurchaseOrderController extends Controller
         return $users;
     }
 
-    public function units_cal(Request $request){
-        // dd($request->all());
-        $sku=Sku::where('id',$request->pro_id)->select('units','mrp')->first();
-        // dd($sku);
-        $units=$sku->units*$request->cases;
-        $price=$sku->mrp*$units;
-
-        return [
-            "units"=>$units,
-            "price"=>$price];
-
-    }
-
+    
     public function po_number(Request $request){
         // dd($request->all());
         $po_number=purchaseOrder::where('territory_id',$request->territory)->get();

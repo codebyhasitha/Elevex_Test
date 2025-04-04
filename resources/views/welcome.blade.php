@@ -10,6 +10,9 @@
         <a href="{{ route('product') }}" class="btn btn-dark shadow">Product</a>
         <a href="{{route('purchase_order.create')}}" class="btn btn-dark shadow"> Order</a>
         <a href="{{route('purchase_order.index')}}" class="btn btn-dark shadow">Purchase Order</a>
+        <a href="{{ route('discount') }}" class="btn btn-dark shadow">Discount</a>
+        <a href="{{ route('freeIssue') }}" class="btn btn-dark shadow">free Issue</a>
+        
 
     </div>
 </div>
