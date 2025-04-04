@@ -65,7 +65,7 @@ Route::get('/view_freeIssue', [freeIssueController::class, 'index'])->name('free
 Route::get('/add_discount', [DiscountController::class, 'create'])->name('discount.create');
 Route::post('/discount', [DiscountController::class, 'store'])->name('discount.store');
 Route::get('/view_discount', [DiscountController::class, 'index'])->name('discount.index');
-Route::post('/load/product_discount', [DiscountController::class, 'getProductDiscount'])->name('product.discount');
+// Route::post('/load/product_discount', [DiscountController::class, 'getProductDiscount'])->name('product.discount');
 
 
 Route::get('/zone', function () {
