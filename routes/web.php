@@ -53,7 +53,7 @@ Route::post('/load/po_number', [PurchaseOrderController::class, 'po_number']);
 Route::post('/table_data', [PurchaseOrderController::class, 'table_data']);
 Route::post('/bulk_conversion', [PurchaseOrderController::class, 'bulk_conversion']);
 Route::post('/load/applyfreeissue', [PurchaseOrderController::class, 'applyfreeissue']);
-
+Route::post('/load/product_discount', [PurchaseOrderController::class, 'product_discount']);
 
 
 //free_issue

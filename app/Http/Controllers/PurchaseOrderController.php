@@ -13,85 +13,78 @@ use App\Models\purchaseOrder;
 use App\Models\PurchaseOrderItem;
 use App\Models\territory;
 use App\Models\freeIssue;
+use App\Models\Discount;
 
 
 use Illuminate\Support\Facades\DB;
 
 class PurchaseOrderController extends Controller
 {
-    // public function applyfreeissue($request){
-    //     $freeIssues = freeIssue::all();
-    //     $purchaseorderitems = PurchaseOrderItem::all();
-    //     $skus = sku::all();
-    //     // $sku=Sku::where('id',$request->pro_iid)->select('units','mrp')->first();
-
-    //     // dd($request);
-    //     foreach ($freeIssues as $freeIssue) {
-    //         $freeIssueid = $freeIssue->id;
-    //         $freeissue_type = $freeIssue->freeissue_type;
-    //         $purchse_product = $freeIssue->purchse_product;
-    //         $purchase_Quantity = $freeIssue->purchase_Quantity;
-    //         $Free_Quantity = $freeIssue->Free_Quantity;
-    //     }     
-
-    //     foreach ($purchaseorderitems as $purchaseorderitem) {
-    //     $id = $purchaseorderitem->id;
-    //     $quantity = $purchaseorderitem->quantity;
-    // }
-
-    //     foreach ($skus as $sku) {
-    //         $skuid = $sku->skuid;
-    //     }
-
-    //     if ($freeIssueid == $skuid) {
-    //         if ($freeissue_type == 'multiple') {
-    //             $freeQty = floor($purchaseorderitem->quantity / $freeIssue->purchase_Quantity) * $freeIssue->Free_Quantity;
-    //             return response()->json(['freeQty' => $freeQty]);
-    //         } else {
-    //             $freeQty = $freeIssue->free_quantity;
-    //             return response()->json(['freeQty' => $freeQty]);
-    //         }
-    //         // $freeIssue = FreeIssue::find($freeIssueId); 
-    //         // $freeIssue->quantity = $freeQty; 
-    //         // $freeIssue->save();
-    //     }        
-    //     return response()->json(['freeQty' => 0]);
-    // }
-
-    // public function applyfreeissue(Request $request){
-    //     $sku = Sku::where('id', $request->pro_id)->select('sku_id')->first();
-    //     // $    
-
-    // }
 
     public function units_cal(Request $request){
-        //dd($request->all());
+    
         $sku=Sku::where('id',$request->pro_id)->select('units','mrp','sku_id')->first();
-        $freeissue=freeIssue::where('id', $request->pro_id)->select('purchse_product','purchase_Quantity','Free_Quantity','freeissue_type')->first();
-        //dd($freeissue);
-        dd($sku, $freeissue); 
+        $freeissue=freeIssue::where('purchse_product', $sku->sku_id)->select('purchse_product','purchase_Quantity','Free_Quantity','freeissue_type')->first();
         
         $freeQty = 0;
         $units=$sku->units*$request->cases;
         $price=$sku->mrp*$units;
 
-        // if($sku->sku_id == $freeissue->purchse_product){
-            // if($freeissue->freeissue_type === 'multiple'){
-            //     $freeQty= $request->cases / $freeissue->purchase_Quantity * $freeissue->Free_Quantity;
-            // }
-            // else{
-            //     $freeQty = $freeissue->Free_Quantity;
-            // }
+        if($sku->sku_id == $freeissue->purchse_product){
+            if($freeissue->freeissue_type === 'multiple'){
+                if( $request->cases >= $freeissue->purchase_Quantity){
+                    $freeQty=floor($request->cases / $freeissue->purchase_Quantity * $freeissue->Free_Quantity) ;
+                }
+                else if($request->cases <= $freeissue->purchase_Quantity){
+                    $freeQty =0;
+                }
+                else{
+                    $freeQty =0;
+                }
+                
+            }
+            else if($freeissue->freeissue_type === 'flat') {
+                if( $request->cases >= $freeissue->purchase_Quantity){
+                    $freeQty = $freeissue->Free_Quantity;
+                }
+                else if($request->cases <= $freeissue->purchase_Quantity){
+                    $freeQty =0;
+                }
+                else{
+                    $freeQty =0;
+                }          
+            }
+            else{
+                $freeQty =0;
+            }
 
-        // }
-       
-        // Return the response in JSON format
+        }
         return [
-            // "freeQty"=>$freeQty,
+            "freeQty"=>$freeQty,
             "units"=>$units,
             "price"=>$price];
     }
 
+    public function product_discount(Request $request)
+    {
+        dd($request->all());
+            $sku = Sku::where('id', $request->pro_id)->select('sku_id')->first();
+            $discount = Discount::where('purchase_product', $sku->sku_id)->select('purchase_product', 'discount_percent')->first();
+            
+            $disAmnt = 0;
+            
+            if ($sku->sku_id == $discount->purchase_product)
+            {
+                $disAmnt = ($request->price * $discount->discount_percent) / 100;
+            } 
+            else {
+                $disAmnt = $request->price;
+            }
+            
+            return response()->json([
+                "disAmnt" => $disAmnt
+            ]);
+    }
         
     public function po_create(){
         $zones = Zone::all();

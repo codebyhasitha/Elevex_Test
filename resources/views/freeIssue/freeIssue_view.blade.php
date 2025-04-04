@@ -21,8 +21,8 @@
                     <tr>
                         <td>{{ $freeIssue->freeissue_name ?? '-' }}</td>
                         <td>{{ $freeIssue->freeissue_type ?? '-' }}</td>
-                        <td>{{ $freeIssue->purchase_product_name ?? '-' }}</td>
-                        <td>{{ $freeIssue->free_product ?? '-' }}</td>
+                        <td>{{ $freeIssue->purchse_product ?? '-' }}</td>
+                        <td>{{ $freeIssue->free_prodcut ?? '-' }}</td>
                         <td>{{ $freeIssue->purchase_Quantity ?? '-' }}</td>
                         <td>{{ $freeIssue->Free_Quantity ?? '-' }}</td>
                     </tr>
