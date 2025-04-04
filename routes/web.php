@@ -4,6 +4,8 @@ use App\Http\Controllers\TestController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SkuController;
 use App\Http\Controllers\PurchaseOrderController;
+use App\Http\Controllers\freeIssueController;
+use App\Http\Controllers\DiscountController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -36,10 +38,10 @@ Route::get('/sku/product_add', [SkuController::class, 'product_create'])->name('
 Route::post('/sku/product_store', [SkuController::class, 'Product_store'])->name('sku.product_store');
 Route::get('/sku/index', [SkuController::class, 'index'])->name('sku.index');
 
+
 // order
 Route::get('/purchase_order/create', [PurchaseOrderController::class, 'po_create'])->name('purchase_order.create');
 Route::post('/purchase_order/store', [PurchaseOrderController::class, 'po_store'])->name('purchase_order.store');
-
 Route::get('/purchase_order/index', [PurchaseOrderController::class, 'po_index'])->name('purchase_order.index');
 
 
@@ -50,6 +52,20 @@ Route::post('/load/units_cal', [PurchaseOrderController::class, 'units_cal']);
 Route::post('/load/po_number', [PurchaseOrderController::class, 'po_number']);
 Route::post('/table_data', [PurchaseOrderController::class, 'table_data']);
 Route::post('/bulk_conversion', [PurchaseOrderController::class, 'bulk_conversion']);
+Route::post('/load/applyfreeissue', [PurchaseOrderController::class, 'applyfreeissue']);
+
+
+
+//free_issue
+Route::get('/freeIssue', [freeIssueController::class, 'create'])->name('freeIssue.create');
+Route::post('/freeIssue', [freeIssueController::class, 'store'])->name('freeIssue.store');
+Route::get('/view_freeIssue', [freeIssueController::class, 'index'])->name('freeIssue.index');
+
+//discount
+Route::get('/add_discount', [DiscountController::class, 'create'])->name('discount.create');
+Route::post('/discount', [DiscountController::class, 'store'])->name('discount.store');
+Route::get('/view_discount', [DiscountController::class, 'index'])->name('discount.index');
+Route::post('/load/product_discount', [DiscountController::class, 'getProductDiscount'])->name('product.discount');
 
 
 Route::get('/zone', function () {
@@ -71,6 +87,14 @@ Route::get('/users', function () {
 Route::get('/product', function () {
     return view('navigating_sku');
 })->name('product');
+
+Route::get('/discount', function () {
+    return view('navigating_discount');
+})->name('discount');
+
+Route::get('/issue', function () {
+    return view('navigating_freeIssue');
+})->name('freeIssue');
 
 
 

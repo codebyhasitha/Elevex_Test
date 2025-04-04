@@ -13,4 +13,13 @@ class PurchaseOrderItem extends Model
     {
         return $this->belongsTo(PurchaseOrder::class);
     }
+    public function product()
+    {
+        return $this->belongsTo(sku::class);  
+    }
+
+    public function zone()
+    {
+        return $this->belongsTo(Zone::class);  
+    }
 }

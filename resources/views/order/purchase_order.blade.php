@@ -61,6 +61,9 @@
                     <th>Enter Quantity</th>
                     <th>Units</th>
                     <th>Total Price</th>
+                    <th>Free Issue</th>
+                    <th>Discount</th> 
+                    <th>Final Price</th>
                 </tr>
             </thead>
             @php
@@ -74,6 +77,7 @@
                     <td>{{ $product->mrp }}</td>
                     <td>
                         <input type="text" class="form-control" name="cases" id="cases_{{ $product->id }}" onkeyup="units_cal({{$product->id}})">
+                        <!-- <input type="text" class="form-control" name="cases" id="cases_{{ $product->id }}"> -->
                     </td>
                     <td>
                         <input type="text" class="form-control" name="units" id="units_{{ $product->id }}" readonly>
@@ -82,6 +86,16 @@
                         <input type="text" class="form-control" name="price" id="price_{{ $product->id }}" readonly>
                         <input type="hidden" class="form-control" name="total_amnt" id="total_amnt_{{$product->id}}" readonly>
                     </td>
+                    <td>
+                        <input type="text" class="form-control" name="freeIssue" id="freeIssue_{{ $product->id }})"readonly>     
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" name="discount" id="discount_{{ $product->id }}" readonly>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" name="final_price" id="final_price_{{ $product->id }}" readonly> 
+                    </td>
+
                 </tr>
                 {{-- <td> <input type="text" style="text-align: center"
                         id="total_amnt_{{$count}}"
@@ -184,6 +198,8 @@
             if (data !== undefined) {
                 $('#units_' + pro_id).val(data.units);
                 $('#price_' + pro_id).val(data.price);
+                $('#freeIssue_' + pro_id).val(data.freeQty);
+                calculate_discount(pro_id, data.price, data.totalAmnt);
                 calculate_amt(data.price);
             } else {
                 console.error("Units field not found in response");
@@ -195,6 +211,38 @@
         });
 
     }
+
+    function calculate_discount(pro_id, price, total_amnt) {
+    
+    $.ajax({
+        type: "POST",
+        url: "{{ url('/load/product_discount') }}",
+        data: {
+            "_token": "{{ csrf_token() }}",
+            'product_id': pro_id
+        },
+        success: function (data) {
+            if (data && data.discount_percentage) {
+                let discount_percentage = data.discount_percentage;
+       
+                let discount_value = (total_amnt * discount_percentage) / 100;
+       
+                let final_price = total_amnt - discount_value;
+
+                $('#discount_' + pro_id).val(discount_value.toFixed(2));
+                $('#final_price_' + pro_id).val(final_price.toFixed(2));
+
+                calculate_amt(final_price);
+            } else {
+                console.error("Discount data not found");
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("AJAX Error:", error);
+        }
+    });
+}
+
     function calculate_amt(data) {
         var total_amount = 0;
 
@@ -229,7 +277,8 @@
                 unit_price: row.cells[2].innerText,
                 quantity: row.querySelector(`input[name='cases']`).value,
                 units: row.querySelector(`input[name='units']`).value,
-                total_price: row.querySelector(`input[name='price']`).value
+                total_price: row.querySelector(`input[name='price']`).value,
+                free_issue: row.querySelector(`input[name='freeIssue']`).value
             };
 
             if (product.quantity && product.quantity > 0) {
@@ -250,11 +299,50 @@
             if (data.redirect) {
                 window.location.href = data.redirect;
             } else {
-                // Handle other responses
+                
             }
         })
         .catch(error => console.error("Error:", error));
     }
+
+    
+    // function units_call(pro_id) {
+    // let casesValue = $('#cases_' + pro_id).val();
+    //     //send the data to back end
+    // $.ajax({
+    //     type: "POST",
+    //     url: "{{ url('/load/applyfreeissue') }}",
+    //     data: {
+    //         "_token": "{{ csrf_token() }}",
+    //         'cases': casesValue,
+    //         'pro_id': pro_id
+    //     },
+
+    //     success: function (data) {
+    //         console.log("Response:", data);
+
+    //         if (data !== undefined) {
+                
+    //             $('#units_' + pro_id).val(data.units);
+    //             $('#price_' + pro_id).val(data.price);
+
+                
+    //             calculate_amt(data.price);
+
+                
+    //             if (data.freeQty !== undefined) {
+    //                 $('#freeIssue_' + pro_id).val(data.freeQty); 
+    //             }
+    //         } else {
+    //             console.error("Units field not found in response");
+    //         }
+    //     },
+    //     error: function (xhr, status, error) {
+    //         console.error("AJAX Error:", error);
+    //     }
+    // });
+// }
+
 </script>
 @endsection
 
