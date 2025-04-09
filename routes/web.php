@@ -6,6 +6,7 @@ use App\Http\Controllers\SkuController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\freeIssueController;
 use App\Http\Controllers\DiscountController;
+use App\Http\Controllers\ExportController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -66,6 +67,14 @@ Route::get('/add_discount', [DiscountController::class, 'create'])->name('discou
 Route::post('/discount', [DiscountController::class, 'store'])->name('discount.store');
 Route::get('/view_discount', [DiscountController::class, 'index'])->name('discount.index');
 // Route::post('/load/product_discount', [DiscountController::class, 'getProductDiscount'])->name('product.discount');
+
+
+Route::get('/export/excel', [ExportController::class, 'exportExcel'])->name('export.excel');
+Route::get('/export/pdf', [ExportController::class, 'exportPDF'])->name('export.pdf');
+
+// print invoice
+Route::get('/print/Invoice_Print',[ExportController::class,'printInvoiceBulk'])->name('Invoice_Print');
+// Route::get('/print/invoice/{id}', [ExportController::class, 'printInvoice'])->name('purchase.invoice.print');
 
 
 Route::get('/zone', function () {

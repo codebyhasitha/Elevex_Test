@@ -209,9 +209,19 @@ class PurchaseOrderController extends Controller
             $po=$po->whereBetween('po.date',[$request->from_date,$request->to_date]);
         }
 
-        $po=$po->get();
+        $perpage= 5;
 
-        return $po;
+        $po = $po -> paginate($perpage);
+
+        return  response ()->json([
+            'po' => $po->items(),
+            'pagination' => [
+                'total' =>$po->total(),
+                'current_page' => $po->currentPage(),
+                'last_page' => $po->lastPage(),
+                'per_page' => $po->perPage(),      
+            ],
+        ]);
     }
 
     public function bulk_conversion(Request $request){
@@ -233,4 +243,10 @@ class PurchaseOrderController extends Controller
             return response()->json(['success' => false, 'message' => 'Bulk conversion failed!', 'error' => $e->getMessage()], 500);
         }
     }
+
+
+
+
+    
+   
 }

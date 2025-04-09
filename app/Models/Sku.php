@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Sku extends Model
 {
     use HasFactory;
+    protected $table = 'skus';
 
     protected $fillable = [
         'sku_id', 'sku_code', 'sku_name', 'mrp', 'distributor_price', 'weight_volume','units'
@@ -21,4 +22,9 @@ class Sku extends Model
     {
         return $this->hasMany(freeIssue::class);  
     }
+    // public function purchaseOrders()
+    // {
+    //     return $this->belongsToMany(PurchaseOrder::class, 'Skus', 'sku_id', 'purchase_order_id')
+    //         ->withPivot('quantity', 'price');
+    // }
 }

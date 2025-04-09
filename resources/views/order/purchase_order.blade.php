@@ -98,6 +98,7 @@
                         </td>
                         <td>
                             <input type="text" class="form-control" name="final_price" id="final_price_{{ $product->id }}" readonly>
+                            
                         </td>
 
 
@@ -206,7 +207,7 @@
                     $('#price_' + pro_id).val(data.price);
                     $('#freeIssue_' + pro_id).val(data.freeQty);
 
-                    calculate_amt(data.price);
+                    // calculate_amt(data.price);
                     calculate_discount(pro_id,data.price);
 
 
@@ -257,8 +258,13 @@
                     console.log("Response:", data);
                    // console.log("Response from server:", data);
                     if (data !== undefined) {
+                        // $('#discount_' + pro_id).val(data.disAmnt);
+                        // calculate_disamt(data.disAmnt);
                         $('#discount_' + pro_id).val(data.disAmnt);
-                        calculate_disamt(data.disAmnt);
+                        
+                            calculate_final_price(pro_id);
+                         
+                    // calculate_final_price(pro_id);
                     } else {
                         console.error("Discount field not found in response");
                     }
@@ -269,20 +275,17 @@
             });
         }
 
-        function calculate_disamt(data) {
-            var total_amount = 0;
+        function calculate_final_price(pro_id) {
+            let price = parseFloat($('#price_' + pro_id).val()) || 0;
+            let discount = parseFloat($('#discount_' + pro_id).val()) || 0;
+            
+            let final_price = price - discount;
 
-            $('input[id^="discount_"]').each(function() {
-                var amount = $(this).val().replace(/,/g, '');
-
-                if (amount !== "" && !isNaN(parseFloat(amount))) {
-                    total_amount += parseFloat(amount);
-                }
-            });
-
-            // $('#total').val(total_amount.toFixed(2));
-            $('#total').val("Rs. " + new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(total_amount));
+            $('#final_price_' + pro_id).val(final_price.toFixed(2));
+            calculate_amt();
         }
+
+        
 
         function form_submit() {
 
