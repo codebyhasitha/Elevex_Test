@@ -19,7 +19,7 @@ class PurchaseOrderExport implements FromCollection, WithHeadings
         return $this->purchaseOrders->map(function ($purchaseOrder) {
             // dd($purchaseOrder);
             return [
-                'PO Number' => $purchaseOrder->id,
+                'PO Number' => $purchaseOrder->po_number,
                 'Zone' => $purchaseOrder->zone->longdescription	,         
                 'Region' => $purchaseOrder->region->region_name,     
                 'Territory' => $purchaseOrder->territory->territory_name, 
@@ -36,7 +36,7 @@ class PurchaseOrderExport implements FromCollection, WithHeadings
 
     public function headings(): array
     {
-        return ['PO Number', 'Zone','Region ID', 'Territory ID', 'Distributor ID', 'Date', 'Remark', 'Total', 'Invoice Number'];
+        return ['PO Number', 'Zone','Region', 'Territory', 'Distributor', 'Date', 'Remark', 'Total', 'Invoice Number'];
     }
   
 }   

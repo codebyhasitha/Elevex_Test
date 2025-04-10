@@ -4,19 +4,18 @@
 <div class="container mt-4">
     <div class="text-center mb-4">
         <h2>Purchase Invoices</h2>
-        <button onclick="window.print()" class="btn btn-primary">Print</button>
+        <button id=print_bt onclick="window.print()" class="btn btn-primary">Print</button>
     </div>
 
     <!-- Invoice Container -->
     <div class="invoice-container">
-        @foreach($purchaseOrders as $purchaseOrder)
+        @foreach($data as $purchaseOrder)
             <div class="invoice">
                 <div class="invoice-header">
                     <h5 class="invoice-title">Purchase Order: {{ $purchaseOrder->po_number }}</h5>
                     <p class="invoice-date"><strong>Date:</strong> {{ $purchaseOrder->date }}</p>
                 </div>
 
-                <!-- Purchase Order Details -->
                 <div class="invoice-details row mb-4">
                     <div class="col-md-3"><strong>Zone:</strong> {{ $purchaseOrder->zone->longdescription }}</div>
                     <div class="col-md-3"><strong>Region:</strong> {{ $purchaseOrder->region->region_name }}</div>
@@ -53,10 +52,9 @@
 @endsection
 
 <style>
-@.invoice-container {
-    display: grid;
+.invoice-container {
     grid-template-columns: repeat(2, 1fr);
-    gap: 30px;
+    gap: 500px;
     margin-top: 30px;
     margin-bottom: 30px;
 }
@@ -80,45 +78,33 @@ th, td {
     text-align: left;
 }
 
-/* Print Layout */
 @media print {
-    /* Hide the print button during printing */
-    button {
-        display: none;
+    #print_bt {
+        display: none !important;
     }
 
-    /* Set page background to white */
     body {
         background: white;
         font-family: Arial, sans-serif;
-        
     }
 
-    /* Adjust the container for invoices */
     .invoice-container {
-        display: block; /* Display invoices as blocks instead of grid */
-        margin: 3;
+        display: block;
+        margin: 0;
         padding: 0;
     }
 
-    /* Style each individual invoice */
     .invoice {
         border: 1px solid #ddd;
         border-radius: 8px;
         padding: 20px;
         background-color: #f9f9f9;
-        box-shadow: none; /* Remove shadow for print */
-        
+        box-shadow: none;
+        page-break-inside: avoid;
+        break-inside: avoid;
+        page-break-after: always;
     }
 
-    /* Ensure each invoice starts on a new page */
-    .invoice::after {
-        content: "";
-        display: block;
-        page-break-before: always; /* Force a page break before each invoice */
-    }
-
-    /* Style the table for print, matching the screen version */
     table {
         width: 100%;
         table-layout: fixed;
@@ -136,14 +122,12 @@ th, td {
         background-color: #f2f2f2;
     }
 
-    /* Footer styling (total cost) */
     .invoice-footer {
         margin-top: 20px;
         text-align: right;
         font-weight: bold;
     }
 
-    /* Reduce the margins for the page */
     @page {
         margin: 20mm;
     }

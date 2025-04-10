@@ -13,7 +13,7 @@
 
 <div class="container">
     <div class="admin-header">
-        <p> Welcome System</p>
+        <p> Welcome</p>
     </div>
 
     <div class="welcome">

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class purchaseOrder extends Model
 {
-    protected $fillable = ['po_number', 'zone_id', 'region_id', 'territory_id', 'distributor_id','sku_id ', 'date', 'remark','total','invoice_number','sku_name'];
+    protected $fillable = ['po_number', 'zone_id', 'region_id', 'territory_id', 'distributor_id','sku_id', 'date', 'remark','total','invoice_number','sku_name'];
 
     public function items()
     {
@@ -38,8 +38,7 @@ class purchaseOrder extends Model
     }
     // public function products()
     // {
-    //     return $this->belongsToMany(Sku::class, 'Skus', 'purchase_order_id', 'sku_id')
-    //         ->withPivot('quantity', 'price');
+    //     return $this->belongsToMany(Sku::class);
     // }
 
     public function purchaseOrder()

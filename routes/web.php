@@ -66,15 +66,18 @@ Route::get('/view_freeIssue', [freeIssueController::class, 'index'])->name('free
 Route::get('/add_discount', [DiscountController::class, 'create'])->name('discount.create');
 Route::post('/discount', [DiscountController::class, 'store'])->name('discount.store');
 Route::get('/view_discount', [DiscountController::class, 'index'])->name('discount.index');
-// Route::post('/load/product_discount', [DiscountController::class, 'getProductDiscount'])->name('product.discount');
 
 
-Route::get('/export/excel', [ExportController::class, 'exportExcel'])->name('export.excel');
-Route::get('/export/pdf', [ExportController::class, 'exportPDF'])->name('export.pdf');
 
-// print invoice
-Route::get('/print/Invoice_Print',[ExportController::class,'printInvoiceBulk'])->name('Invoice_Print');
-// Route::get('/print/invoice/{id}', [ExportController::class, 'printInvoice'])->name('purchase.invoice.print');
+Route::post('/export_excel', [ExportController::class, 'exportExcel'])->name('export.excel');
+Route::post('/export_pdf', [ExportController::class, 'exportPdf'])->name('export.pdf');
+Route::post('/preview_print', [ExportController::class, 'printInvoiceBulk'])->name('print.preview');
+
+
+
+
+
+
 
 
 Route::get('/zone', function () {

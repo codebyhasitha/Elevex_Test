@@ -12,13 +12,13 @@
                 <th>Territory </th>
                 <th>Distributor </th>
                 <th>Date</th>
-                <th>Remark</th>
+                <th>Remark</th> 
                 <th>Total</th>
                 <th>Invoice Number</th>
             </tr>
         </thead>
         <tbody>
-        @foreach ($purchaseOrders as $purchaseOrder)
+        @foreach ($data as $purchaseOrder)
     <tr>
         <td>{{ $purchaseOrder->po_number }}</td>
         <td>{{ $purchaseOrder->zone->longdescription }}</td>  

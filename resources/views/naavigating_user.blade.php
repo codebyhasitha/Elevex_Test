@@ -1,14 +1,12 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mt-3">
-    <div class="d-flex justify-content-center gap-3 flex-wrap">
-        <a href="{{route('users.create')}}" class="btn btn-dark shadow">Users</a>
-        <a href="{{route('users.index')}}" class="btn btn-dark shadow">Users view</a>
-
-
+    <div class="container mt-3">
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <a href="{{route('users.create')}}" class="btn btn-dark shadow">Users</a>
+            <a href="{{route('users.index')}}" class="btn btn-dark shadow">Users view</a>
+        </div>
     </div>
-</div>
 <style>
     .btn {
     font-size: 16px;

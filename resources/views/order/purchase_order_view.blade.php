@@ -71,6 +71,15 @@
                 </button>
             </div> --}}
 
+            <form id="exportForm" method="POST" action="{{ route('export.excel') }}" style="display:none">
+                @csrf
+                <input type="hidden" name="region_id">
+                <input type="hidden" name="territory_id">
+                <input type="hidden" name="po">
+                <input type="hidden" name="from_date">
+                <input type="hidden" name="to_date">
+            </form>
+
 
             <!-- Table -->
             <h3 class="text-center">Purchase Order Details</h3>
@@ -97,9 +106,9 @@
         <nav id="pagination-nav" class="mt-4">
             <ul class="pagination justify-content-center"></ul>
         </nav>
-                <a href="{{ route('export.excel') }}" class="btn btn-success" id="export_excel">Export to Excel</a>   
-                <a href="{{ route('export.pdf') }}" class="btn btn-danger" id="export_pdf">Export to PDF</a>
-                <a href="{{ route('Invoice_Print') }}" class="btn btn-primary" id="preview_print">Preview to Print</a>
+                <button type="button" class="btn btn-success" id="export_excel">Export to Excel</button>   
+                <button type="button" class="btn btn-danger" id="export_pdf">Export to PDF</button> 
+                <button type="button" class="btn btn-primary" id="preview_print">Priview to Print</button> 
     </div>
                 
 
@@ -286,6 +295,8 @@
         });
     }
 
+    let searchData = {};
+
     function load_table(event, page = 1) {
     if (event) event.preventDefault();
 
@@ -304,6 +315,14 @@
         });
         return;
     }
+    searchData ={
+        region_id : region_id,
+        territory_id: territory_id,
+        po_number : po_number,
+        from_date : from_date,
+        to_date : to_date,
+        page : page,
+    };
 
     let data = {
         "_token": "{{ csrf_token() }}",
@@ -351,14 +370,13 @@
                     </tr>
                 `;
                 tableBody.append(row);
+                
             });
 
-            // Handle pagination buttons
             let pagination = response.pagination;
             let paginationContainer = $('#pagination-nav .pagination');
             paginationContainer.empty();
 
-            // Previous
             if (pagination.current_page > 1) {
                 paginationContainer.append(`
                     <li class="page-item">
@@ -367,7 +385,6 @@
                 `);
             }
 
-            // Page numbers
             for (let i = 1; i <= pagination.last_page; i++) {
                 paginationContainer.append(`
                     <li class="page-item ${i === pagination.current_page ? 'active' : ''}">
@@ -376,7 +393,6 @@
                 `);
             }
 
-            // Next
             if (pagination.current_page < pagination.last_page) {
                 paginationContainer.append(`
                     <li class="page-item">
@@ -426,60 +442,51 @@
     });
 });
 
-$('#export_excel').on('click', function() {
-    let region_id = $('#region_id').val();
-    let territory_id = $('#territory').val();
-    let po_number = $('#po_number').val();
-    // let from_date = $('#from_date').val();
-    // let to_date = $('#to_date').val();
+function fillAndSubmitForm() {
+    $('#exportForm input[name="region_id"]').val($('#region_id').val());
+    $('#exportForm input[name="territory_id"]').val($('#territory').val());
+    $('#exportForm input[name="po"]').val($('#po_number').val());
+    $('#exportForm input[name="from_date"]').val($('#from_date').val());
+    $('#exportForm input[name="to_date"]').val($('#to_date').val());
 
-    // Construct the URL with query parameters/
-    let url = "{{ route('export.excel') }}";
-    url += '?region_id=' + region_id;
-    url += '&territory=' + territory_id;
-    url += '&po_number=' + po_number;
-    // url += '&from_date=' + from_date;
-    // url += '&to_date=' + to_date;
+    $('#exportForm').submit();
+}
 
-    // Navigate to the constructed URL
-    window.location.href = url;
-
-    console.log('URL:', url); // Debugging: Check the constructed URL
+$('#export_pdf').on('click', function () {
+    $('#exportForm').attr('action', "{{ route('export.pdf') }}");
+    fillAndSubmitForm();
 });
 
+$('#export_excel').on('click', function () {
+    $('#exportForm').attr('action', "{{ route('export.excel') }}");
+    fillAndSubmitForm();
+});
+
+$('#preview_print').on('click', function () {
+    // Prepare data for the form
+    $('#exportForm input[name="region_id"]').val($('#region_id').val());
+    $('#exportForm input[name="territory_id"]').val($('#territory').val());
+    $('#exportForm input[name="po"]').val($('#po_number').val());
+    $('#exportForm input[name="from_date"]').val($('#from_date').val());
+    $('#exportForm input[name="to_date"]').val($('#to_date').val());
+
+    // Set the action to the print preview route
+    $('#exportForm').attr('action', "{{ route('print.preview') }}");
+
+    // Submit the form for preview
+    $('#exportForm').submit();
+});
+
+
 // $('#export_excel').on('click', function () {
-//     let region_id = $('#region_id').val();
-//     let territory = $('#territory').val();
-//     let po_number = $('#po_number').val();
-//     let from_date = $('#from_date').val();
-//     let to_date = $('#to_date').val();
+//     $('#exportForm input[name="region_id"]').val($('#region_id').val());
+//     $('#exportForm input[name="territory_id"]').val($('#territory').val());
+//     $('#exportForm input[name="po"]').val($('#po_number').val());
+//     $('#exportForm input[name="from_date"]').val($('#from_date').val());
+//     $('#exportForm input[name="to_date"]').val($('#to_date').val());
 
-//     $.ajax({
-//         type: "POST",
-//         url: "{{ url('/export/excel') }}", 
-//         data: {
-//             "_token": "{{ csrf_token() }}",  
-//             "region_id": region_id,
-//             "territory": territory,
-//             "po_number": po_number,
-//             "from_date": from_date,
-//             "to_date": to_date
-//         },
-//         success: function (response) {
-//             if (response.success) {
-                
-//                 window.location.href = response.url;  
-//             } else {
-//                 alert('Export failed!');
-//             }
-//         },
-//         error: function (error) {
-//             console.error("Error:", error);
-//             alert('Something went wrong. Please try again!');
-//         }
-//     });
+//     $('#exportForm').submit();
 // });
-
 
 </script>
 @endsection
