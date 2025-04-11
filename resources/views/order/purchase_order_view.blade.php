@@ -12,7 +12,7 @@
         {{-- <form method="POST" action="{{ route('purchase_order.index') }}">
             @csrf --}}
 
-            <!-- Dropdowns in a single row -->
+            
             <div class="row mb-3">
                 <div class="col-md-4">
                     <label for="region" class="form-label">Region</label>
@@ -476,17 +476,6 @@ $('#preview_print').on('click', function () {
     // Submit the form for preview
     $('#exportForm').submit();
 });
-
-
-// $('#export_excel').on('click', function () {
-//     $('#exportForm input[name="region_id"]').val($('#region_id').val());
-//     $('#exportForm input[name="territory_id"]').val($('#territory').val());
-//     $('#exportForm input[name="po"]').val($('#po_number').val());
-//     $('#exportForm input[name="from_date"]').val($('#from_date').val());
-//     $('#exportForm input[name="to_date"]').val($('#to_date').val());
-
-//     $('#exportForm').submit();
-// });
 
 </script>
 @endsection

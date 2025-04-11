@@ -60,16 +60,13 @@ class ExportController extends Controller
             )
             ->get();
 
-        // Generate the PDF
         $pdf = Pdf::loadView('exports.purchase_orders_pdf', ['data' => $data]);
 
-        // Return the PDF as a download
         return $pdf->download('purchase_orders.pdf');
     }
 
     public function printInvoiceBulk(Request $request)
 {
-    // Validate the incoming request parameters if needed
     $validated = $request->validate([
         'region_id' => 'nullable|integer',
         'territory_id' => 'nullable|integer',

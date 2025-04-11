@@ -27,6 +27,8 @@ Route::get('admin/region_index', [TestController::class, 'region_index'])->name(
 Route::get('/admin/territory', [TestController::class, 'territory_create'])->name('territory.create');
 Route::post('/admin/territory', [TestController::class, 'territory_store'])->name('territory.store');
 Route::get('admin/territories_index', [TestController::class, 'territory_index'])->name('territory.index');
+Route::get('/get-regions-by-zone/{zoneId}', [TestController::class, 'getRegionsByZone']);
+
 
 //user
 Route::get('/user/add_user', [UserController::class, 'user_create'])->name('users.create');

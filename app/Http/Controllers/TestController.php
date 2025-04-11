@@ -91,6 +91,11 @@ public function territory_store(Request $request) {
 
     return redirect()->back()->with('success', 'Territory added successfully!');
 
-}
+    }
+    public function getRegionsByZone($zoneId)
+    {
+        $regions = rregion::where('zone_id', $zoneId)->get(['id', 'region_name']);
+        return response()->json($regions);
+    }
 
 }

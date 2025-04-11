@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.pdf')
 
 @section('content')
     <title>Purchase Orders PDF</title>

@@ -130,6 +130,21 @@ th, td {
 
     @page {
         margin: 20mm;
+    }   
+    
+    nav, .admin-header, .welcome {
+        display: none !important;
     }
+
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
+    .container, .flex-grow-1 {
+        width: 100% !important;
+        padding: 0 !important;
+    }
+
 }
 </style>
