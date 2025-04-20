@@ -223,7 +223,7 @@
         }
 
 
-        function calculate_amt(price,disAmnt) {
+        function calculate_amt(data) {
             var total_amount = 0;
 
             $('input[id^="price_"]').each(function() {
@@ -261,7 +261,6 @@
                     if (data !== undefined) {
                         $('#discount_' + pro_id).val(data.disAmnt);
                         calculate_disamt(data.disAmnt);
-                        calculate_amt(data.disAmnt);
                     } else {
                         console.error("Discount field not found in response");
                     }
@@ -285,20 +284,6 @@
 
             // $('#total').val(total_amount.toFixed(2));
             $('#total').val("Rs. " + new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(total_amount));
-        }
-
-        function calculate_final_price(pro_id) {
-
-                var totalAmount = parseFloat($('#total_amnt_' + pro_id).val().replace(/,/g, '')) || 0;
-
-                var discount = parseFloat($('#discount_' + pro_id).val().replace(/,/g, '')) || 0;
-
-                var finalPrice = totalAmount - discount;
-
-                $('#final_price_' + pro_id).val("Rs. " + new Intl.NumberFormat('en-US', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                }).format(finalPrice));
         }
 
         function form_submit() {

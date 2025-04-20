@@ -12,7 +12,7 @@
         {{-- <form method="POST" action="{{ route('purchase_order.index') }}">
             @csrf --}}
 
-            <!-- Dropdowns in a single row -->
+            
             <div class="row mb-3">
                 <div class="col-md-4">
                     <label for="region" class="form-label">Region</label>
@@ -71,6 +71,15 @@
                 </button>
             </div> --}}
 
+            <form id="exportForm" method="POST" action="{{ route('export.excel') }}" style="display:none">
+                @csrf
+                <input type="hidden" name="region_id">
+                <input type="hidden" name="territory_id">
+                <input type="hidden" name="po">
+                <input type="hidden" name="from_date">
+                <input type="hidden" name="to_date">
+            </form>
+
 
             <!-- Table -->
             <h3 class="text-center">Purchase Order Details</h3>
@@ -93,7 +102,16 @@
                 </table>
             </div>
         {{-- </form> --}}
+                
+        <nav id="pagination-nav" class="mt-4">
+            <ul class="pagination justify-content-center"></ul>
+        </nav>
+                <button type="button" class="btn btn-success" id="export_excel">Export to Excel</button>   
+                <button type="button" class="btn btn-danger" id="export_pdf">Export to PDF</button> 
+                <button type="button" class="btn btn-primary" id="preview_print">Priview to Print</button> 
     </div>
+                
+
 </div>
 <script>
     function load_region() {
@@ -109,9 +127,12 @@
                 // console.log(data)
                 $('#region_id').empty();
                 $('#region_id').append('<option value="">SELECT REGION</option>');
-                for (var i = 0; i < data.length; i++) {
-                    $('#region_id').append('<option value="'+data[i].id+'">'+data[i].region_name+'</option>');
-                }
+                // for (var i = 0; i < data.length; i++) {
+                //     $('#region_id').append('<option value="'+data[i].id+'">'+data[i].region_name+'</option>');
+                // }
+                data.forEach(function(region) {
+                    $('#region_id').append('<option value="' + region.id + '">' + region.region_name + '</option>');
+                });
             }
         });
     }
@@ -128,9 +149,12 @@
                 // console.log(data)
                 $('#territory').empty();
                 $('#territory').append('<option value="">SELECT TERRITORY</option>');
-                for (var i = 0; i < data.length; i++) {
-                    $('#territory').append('<option value="'+data[i].id+'">'+data[i].territory_name+'</option>');
-                }
+                // for (var i = 0; i < data.length; i++) {
+                //     $('#territory').append('<option value="'+data[i].id+'">'+data[i].territory_name+'</option>');
+                // }
+                data.forEach(function(territory) {
+                    $('#territory').append('<option value="' + territory.id + '">' + territory.territory_name + '</option>');
+                });
             }
         });
     }
@@ -163,12 +187,15 @@
             },
 
             success: function (data) {
-                // console.log(data)
+                
                 $('#po_number').empty();
                 $('#po_number').append('<option value="">SELECT PO NUMBER</option>');
-                for (var i = 0; i < data.length; i++) {
-                    $('#po_number').append('<option value="'+data[i].id+'">'+data[i].po_number+'</option>');
-                }
+                // for (var i = 0; i < data.length; i++) {
+                //     $('#po_number').append('<option value="'+data[i].id+'">'+data[i].po_number+'</option>');
+                // }
+                data.forEach(function(po) {
+                    $('#po_number').append('<option value="' + po.id + '">' + po.po_number + '</option>');
+                });
             }
         });
     }
@@ -200,6 +227,51 @@
             bulk_conversion(selectedPoIds);
         });
     });
+    // function bulk_conversion(poIds) {
+    //     $.ajax({
+    //         type: "POST",
+    //         url: "{{ url('/bulk_conversion') }}",
+    //         data: {
+    //             "_token": "{{ csrf_token() }}",
+    //             "po_ids": poIds
+    //         },
+    //         success: function (response) {
+    //             if (response.success) {
+    //                 alert(response.message);
+    //                 window.location.href = response.redirect;
+    //             } else {
+    //                 alert('Bulk conversion failed!');
+    //             }
+    //         },
+    //         error: function (error) {
+    //             console.error("Error:", error);
+    //             alert('Something went wrong! Please try again.');
+    //         }
+    //     });
+    // }
+    $('#bulk_button').on('click', function () {
+        let selectedPoIds = [];
+
+        // Collect selected PO IDs from checked checkboxes
+        $('.row-check:checked').each(function () {
+            let poId = $(this).data('po-id');
+            selectedPoIds.push(poId);
+        });
+
+        if (selectedPoIds.length === 0) {
+            $.alert({
+                title: 'Alert',
+                icon: 'fa fa-warning',
+                type: 'red',
+                content: 'Please select at least one PO!'
+            });
+            return;
+        }
+
+        // Call the bulk conversion function
+        bulk_conversion(selectedPoIds);
+    });
+
     function bulk_conversion(poIds) {
         $.ajax({
             type: "POST",
@@ -211,7 +283,7 @@
             success: function (response) {
                 if (response.success) {
                     alert(response.message);
-                    window.location.href = response.redirect;
+                    window.location.href = response.redirect;  // Redirect to the purchase order index
                 } else {
                     alert('Bulk conversion failed!');
                 }
@@ -223,72 +295,117 @@
         });
     }
 
+    let searchData = {};
 
-    function load_table(event) {
-        event.preventDefault();
-        // console.log('hi');
-        let region_id = $('#region_id').val();
-        let territory_id = $('#territory').val();
-        let po_number = $('#po_number').val();
-        let from_date = $('#from_date').val();
-        let to_date = $('#to_date').val();
+    function load_table(event, page = 1) {
+    if (event) event.preventDefault();
 
-        if ((from_date && !to_date) || (!from_date && to_date)) {
-            $.alert({
-                title: 'Alert',
-                icon: 'fa fa-warning',
-                type: 'blue',
-                content: 'Please select both From Date and To Date!'
-            });
-            return;
-        }
+    let region_id = $('#region_id').val();
+    let territory_id = $('#territory').val();
+    let po_number = $('#po_number').val();
+    let from_date = $('#from_date').val();
+    let to_date = $('#to_date').val();  
 
-        let data = {
-            "_token": "{{ csrf_token() }}",
-            "region_id": region_id,
-            "territory_id": territory_id,
-            "po": po_number,
-            "from_date": from_date,
-            "to_date": to_date,
-        };
-        console.log(data);
-        $.ajax({
-            type: "POST",
-            url: "{{ url('/table_data') }}",
-            data: data,
-            success: function (response) {
-                let tableBody = $('#purchase_orders tbody');
-                tableBody.empty();
-
-                response.forEach(product => {
-                    let createdAt = new Date(product.created_at).toLocaleTimeString('en-US', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit',
-                        hour12: false
-                    });
-
-                    let row = `
-                        <tr>
-                            <td> <input class="form-check-input row-check" type="checkbox" data-po-id="${product.id}"></td>
-                            <td>${product.region_name}</td>
-                            <td>${product.territory_name}</td>
-                            <td>${product.name}</td>
-                            <td>${product.po_number}</td>
-                            <td>${product.invoice_number ?? ''}</td>
-                            <td>${product.date}</td>
-                            <td>${createdAt}</td>
-                            <td>${product.total ?? ''}</td>
-                        </tr>
-                    `;
-                    tableBody.append(row);
-                });
-            },
-            error: function (error) {
-                console.error("Error fetching data:", error);
-            }
+    if ((from_date && !to_date) || (!from_date && to_date)) {
+        $.alert({
+            title: 'Alert',
+            icon: 'fa fa-warning',
+            type: 'blue',
+            content: 'Please select both From Date and To Date!'
         });
+        return;
     }
+    searchData ={
+        region_id : region_id,
+        territory_id: territory_id,
+        po_number : po_number,
+        from_date : from_date,
+        to_date : to_date,
+        page : page,
+    };
+
+    let data = {
+        "_token": "{{ csrf_token() }}",
+        "region_id": region_id,
+        "territory_id": territory_id,
+        "po": po_number,
+        "from_date": from_date,
+        "to_date": to_date,
+        "page": page 
+    };
+
+    $.ajax({
+        type: "POST",
+        url: "{{ url('/table_data') }}",
+        data: data,
+        success: function (response) {
+            let tableBody = $('#purchase_orders tbody');
+            tableBody.empty();
+
+            if (response.po.length === 0) {
+                tableBody.append(`<tr><td colspan="9" class="text-center">No records found</td></tr>`);
+                $('#pagination-nav .pagination').empty();
+                return;
+            }
+
+            response.po.forEach(product => {
+                let createdAt = new Date(product.created_at).toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                });
+
+                let row = `
+                    <tr>
+                        <td><input class="form-check-input row-check" type="checkbox" data-po-id="${product.id}"></td>
+                        <td>${product.region_name}</td>
+                        <td>${product.territory_name}</td>
+                        <td>${product.name}</td>
+                        <td>${product.po_number}</td>
+                        <td>${product.invoice_number ?? ''}</td>
+                        <td>${product.date}</td>
+                        <td>${createdAt}</td>
+                        <td>${product.total ?? ''}</td>
+                    </tr>
+                `;
+                tableBody.append(row);
+                
+            });
+
+            let pagination = response.pagination;
+            let paginationContainer = $('#pagination-nav .pagination');
+            paginationContainer.empty();
+
+            if (pagination.current_page > 1) {
+                paginationContainer.append(`
+                    <li class="page-item">
+                        <a class="page-link" href="#" data-page="${pagination.current_page - 1}">Previous</a>
+                    </li>
+                `);
+            }
+
+            for (let i = 1; i <= pagination.last_page; i++) {
+                paginationContainer.append(`
+                    <li class="page-item ${i === pagination.current_page ? 'active' : ''}">
+                        <a class="page-link" href="#" data-page="${i}">${i}</a>
+                    </li>
+                `);
+            }
+
+            if (pagination.current_page < pagination.last_page) {
+                paginationContainer.append(`
+                    <li class="page-item">
+                        <a class="page-link" href="#" data-page="${pagination.current_page + 1}">Next</a>
+                    </li>
+                `);
+            }
+        },
+        error: function (error) {
+            console.error("Error fetching data:", error);
+        }
+    });
+}
 
     function units_cal(pro_id) {
         let casesValue = $('#cases_' + pro_id).val();
@@ -315,8 +432,71 @@
         }
         });
     }
+
+    $(document).ready(function () {
+    
+    $(document).on('click', '.pagination .page-link', function (e) {
+        e.preventDefault();
+        let page = $(this).data('page');
+        load_table(null, page); 
+    });
+});
+
+function fillAndSubmitForm() {
+    $('#exportForm input[name="region_id"]').val($('#region_id').val());
+    $('#exportForm input[name="territory_id"]').val($('#territory').val());
+    $('#exportForm input[name="po"]').val($('#po_number').val());
+    $('#exportForm input[name="from_date"]').val($('#from_date').val());
+    $('#exportForm input[name="to_date"]').val($('#to_date').val());
+
+    $('#exportForm').submit();
+}
+
+$('#export_pdf').on('click', function () {
+    $('#exportForm').attr('action', "{{ route('export.pdf') }}");
+    fillAndSubmitForm();
+});
+
+$('#export_excel').on('click', function () {
+    $('#exportForm').attr('action', "{{ route('export.excel') }}");
+    fillAndSubmitForm();
+});
+
+$('#preview_print').on('click', function () {
+    // Prepare data for the form
+    $('#exportForm input[name="region_id"]').val($('#region_id').val());
+    $('#exportForm input[name="territory_id"]').val($('#territory').val());
+    $('#exportForm input[name="po"]').val($('#po_number').val());
+    $('#exportForm input[name="from_date"]').val($('#from_date').val());
+    $('#exportForm input[name="to_date"]').val($('#to_date').val());
+
+    // Set the action to the print preview route
+    $('#exportForm').attr('action', "{{ route('print.preview') }}");
+
+    // Submit the form for preview
+    $('#exportForm').submit();
+});
+
 </script>
 @endsection
 
 {{-- <script src="{{ asset('js/purchase_order.js') }}"></script> --}}
+<style>
+    .pagination .page-link {
+        color: #000;
+        background-color: #fff;
+        border: 1px solid #000;
+    }
+
+    .pagination .page-item.active .page-link {
+        color: #fff;
+        background-color: #000;
+        border-color: #000;
+    }
+
+    .pagination .page-link:hover {
+        background-color: #000;
+        color: #fff;
+    }
+</style>
 

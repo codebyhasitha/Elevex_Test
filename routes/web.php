@@ -6,7 +6,6 @@ use App\Http\Controllers\SkuController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\freeIssueController;
 use App\Http\Controllers\DiscountController;
-use App\Http\Controllers\GpsLocationController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -27,6 +26,8 @@ Route::get('admin/region_index', [TestController::class, 'region_index'])->name(
 Route::get('/admin/territory', [TestController::class, 'territory_create'])->name('territory.create');
 Route::post('/admin/territory', [TestController::class, 'territory_store'])->name('territory.store');
 Route::get('admin/territories_index', [TestController::class, 'territory_index'])->name('territory.index');
+Route::get('/get-regions-by-zone/{zoneId}', [TestController::class, 'getRegionsByZone']);
+
 
 //user
 Route::get('/user/add_user', [UserController::class, 'user_create'])->name('users.create');
@@ -66,15 +67,7 @@ Route::get('/view_freeIssue', [freeIssueController::class, 'index'])->name('free
 Route::get('/add_discount', [DiscountController::class, 'create'])->name('discount.create');
 Route::post('/discount', [DiscountController::class, 'store'])->name('discount.store');
 Route::get('/view_discount', [DiscountController::class, 'index'])->name('discount.index');
-// Route::post('/load/product_discount', [DiscountController::class, 'getProductDiscount'])->name('product.discount');
-
-// GPS Tracking
-Route::get('/get-rep-path', [GpsLocationController::class, 'getRepPath']);
-
-Route::get('/gps-locations', [GpsLocationController::class, 'index'])->name('gps_locations.index');
-Route::get('/gps-path', [GpsLocationController::class, 'getLocationsByUserAndDate']);
-
-
+Route::post('/load/product_discount', [DiscountController::class, 'getProductDiscount'])->name('product.discount');
 
 
 Route::get('/zone', function () {

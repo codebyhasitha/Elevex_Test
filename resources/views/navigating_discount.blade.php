@@ -6,7 +6,6 @@
         <a href="{{ route('discount.create') }}" class="btn btn-dark shadow mr-4">Add Discount</a>
         <a href="{{ route('discount.index') }}" class="btn btn-dark shadow">View Discount</a>
     </div>
-
     </div>
 </div>
 <style>

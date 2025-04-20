@@ -39,10 +39,7 @@
             <div class="mb-3">
                     <label for="region" class="form-label">Region</label>
                     <select class="form-control" name="region_id" id="region">
-                        <option value="">Select</option>
-                        @foreach($regions as $region)
-                            <option value="{{ $region->id }}">{{ $region->region_name }}</option>
-                        @endforeach
+                        <option value="">Select a zone first</option>
                     </select>
             </div>
 
@@ -61,4 +58,31 @@
     </div>
     <script src="{{ asset('js/add_territory.js') }}"></script>
 </body>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $('#zone').on('change', function () {
+        var zoneId = $(this).val();
+        $('#region').html('<option value="">Loading...</option>');
+
+        if (zoneId) {
+            $.ajax({
+                url: '/get-regions-by-zone/' + zoneId,
+                type: 'GET',
+                success: function (data) {
+                    $('#region').empty().append('<option value="">Select</option>');
+                    data.forEach(function (region) {
+                        $('#region').append('<option value="' + region.id + '">' + region.region_name + '</option>');
+                    });
+                },
+                error: function () {
+                    $('#region').html('<option value="">Error loading regions</option>');
+                }
+            });
+        } else {
+            $('#region').html('<option value="">Select a Zone First</option>');
+        }
+    });
+</script>
+
 </html>
