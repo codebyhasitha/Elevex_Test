@@ -48,4 +48,9 @@ class User extends Authenticatable
     public function territory(){
         return $this->hasMany(tterritory::class, 'id','territory_id');
     }
+
+    public function gpsLocations()
+    {
+        return $this->hasMany(GpsLocation::class);
+    }
 }

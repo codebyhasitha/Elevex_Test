@@ -6,6 +6,7 @@ use App\Http\Controllers\SkuController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\freeIssueController;
 use App\Http\Controllers\DiscountController;
+use App\Http\Controllers\GpsLocationController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -65,7 +66,15 @@ Route::get('/view_freeIssue', [freeIssueController::class, 'index'])->name('free
 Route::get('/add_discount', [DiscountController::class, 'create'])->name('discount.create');
 Route::post('/discount', [DiscountController::class, 'store'])->name('discount.store');
 Route::get('/view_discount', [DiscountController::class, 'index'])->name('discount.index');
-Route::post('/load/product_discount', [DiscountController::class, 'getProductDiscount'])->name('product.discount');
+// Route::post('/load/product_discount', [DiscountController::class, 'getProductDiscount'])->name('product.discount');
+
+// GPS Tracking
+Route::get('/get-rep-path', [GpsLocationController::class, 'getRepPath']);
+
+Route::get('/gps-locations', [GpsLocationController::class, 'index'])->name('gps_locations.index');
+Route::get('/gps-path', [GpsLocationController::class, 'getLocationsByUserAndDate']);
+
+
 
 
 Route::get('/zone', function () {

@@ -62,7 +62,7 @@
                         <th>Units</th>
                         <th>Total Price</th>
                         <th>Free Issue</th>
-                        <th>Discount</th> 
+                        <th>Discount</th>
                         <th>Final Price</th>
                     </tr>
                 </thead>
@@ -76,8 +76,9 @@
                         <td>{{ $product->sku_name }}</td>
                         <td>{{ $product->mrp }}</td>
                         <td>
-                            <input type="text" class="form-control" name="cases" id="cases_{{ $product->id }}" onkeyup="units_cal({{$product->  id}})">
-                            <!-- <input type="text" class="form-control" name="cases" id="cases_{{ $product->id }}" onkeyup="units_cal({{ $product->id }}); calculate_discount({{ $product->id }});"> -->
+                            {{-- <input type="text" class="form-control" name="cases" id="cases_{{ $product->id }}" onkeyup="units_cal({{$product->  id}})"> --}}
+                            <input type="text" class="form-control" name="cases" id="cases_{{ $product->id }}"
+                                onkeyup="units_cal({{ $product->id }}); calculate_discount({{ $product->id }});">
                             <!-- <input type="text" class="form-control" name="cases" id="cases_{{ $product->id }}"> -->
                         </td>
                         <td>
@@ -90,15 +91,15 @@
                         <input type="hidden" class="form-control" name="total_amnt" id="total_amnt_{{$product->id}}" readonly>
                         </td>
                         <td>
-                            <input type="text" class="form-control" name="freeIssue" id="freeIssue_{{ $product->id }}"readonly>     
+                            <input type="text" class="form-control" name="freeIssue" id="freeIssue_{{ $product->id }}"readonly>
                         </td>
                         <td>
                             <input type="text" class="form-control" name="discount" id="discount_{{ $product->id }}" readonly>
                         </td>
                         <td>
-                            <input type="text" class="form-control" name="final_price" id="final_price_{{ $product->id }}" readonly> 
+                            <input type="text" class="form-control" name="final_price" id="final_price_{{ $product->id }}" readonly>
                         </td>
-                        
+
 
 
                     </tr>
@@ -199,65 +200,68 @@
                 },
 
                 success: function (data) {
-                console.log("Response:", data);
+                // console.log("Response:", data);
                 if (data !== undefined) {
                     $('#units_' + pro_id).val(data.units);
                     $('#price_' + pro_id).val(data.price);
                     $('#freeIssue_' + pro_id).val(data.freeQty);
-                    
+
                     calculate_amt(data.price);
                     calculate_discount(pro_id,data.price);
-                    
-                    
+
+
 
                 } else {
                     console.error("Units field not found in response");
                 }
             },
-            
+
             error: function (xhr, status, error) {
                 console.error("AJAX Error:", error);
             }
             });
         }
-            
-            
-        function calculate_amt(data) {
+
+
+        function calculate_amt(price,disAmnt) {
             var total_amount = 0;
 
-            $('input[id^="final_price_"]').each(function() {
+            $('input[id^="price_"]').each(function() {
                 var amount = $(this).val().replace(/,/g, '');
 
                 if (amount !== "" && !isNaN(parseFloat(amount))) {
                     total_amount += parseFloat(amount);
                 }
+                finalPrice = total_amount - disAmnt;
+                // $('#final_price_' + pro_id).val("Rs. " + new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(finalPrice));
             });
 
             // $('#total').val(total_amount.toFixed(2));
             $('#total').val("Rs. " + new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(total_amount));
             return total_amount;
         }
-                
+
 
         function calculate_discount(pro_id,price) {
             $.ajax({
                 type: "POST",
                 url: "{{ url('/load/product_discount') }}",
-                
+
                 data: {
-                    
+
                     "_token": "{{ csrf_token() }}",
                     'pro_id': pro_id,
-                    'price': price,  
-                    
+                    'price': price,
+
                 },
                 success: function (data) {
-                    
+
                     console.log("Response:", data);
-                   // console.log("Response from server:", data); 
+                   // console.log("Response from server:", data);
                     if (data !== undefined) {
-                        $('#discount_' + pro_id).val(data.disAmnt); 
-                        calculate_disamt(data.disAmnt);                    
+                        $('#discount_' + pro_id).val(data.disAmnt);
+                        calculate_disamt(data.disAmnt);
+                        calculate_amt(data.disAmnt);
                     } else {
                         console.error("Discount field not found in response");
                     }
@@ -282,7 +286,21 @@
             // $('#total').val(total_amount.toFixed(2));
             $('#total').val("Rs. " + new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(total_amount));
         }
-        
+
+        function calculate_final_price(pro_id) {
+
+                var totalAmount = parseFloat($('#total_amnt_' + pro_id).val().replace(/,/g, '')) || 0;
+
+                var discount = parseFloat($('#discount_' + pro_id).val().replace(/,/g, '')) || 0;
+
+                var finalPrice = totalAmount - discount;
+
+                $('#final_price_' + pro_id).val("Rs. " + new Intl.NumberFormat('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }).format(finalPrice));
+        }
+
         function form_submit() {
 
             let formData = {
@@ -325,7 +343,7 @@
                 if (data.redirect) {
                     window.location.href = data.redirect;
                 } else {
-                    
+
                 }
             })
             .catch(error => console.error("Error:", error));
